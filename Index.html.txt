@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+    <title>Spanien Sår & Sten</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --blood-red: #c41e3a;
+            --granite: #4a4a4a;
+            --wine: #722f37;
+            --gold: #d4af37;
+            --dark: #1a1a1a;
+            --light: #f5f5f5;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--blood-red) 0%, var(--wine) 100%);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        
+        /* Score Board */
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .player {
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            min-width: 80px;
+        }
+        
+        .player.leader {
+            background: var(--gold);
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+        
+        .player-name {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .player-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding: 15px;
+            background: var(--dark);
+            position: sticky;
+            top: 70px;
+            z-index: 99;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            background: var(--blood-red);
+            font-weight: 600;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Day Cards */
+        .day-card {
+            background: linear-gradient(135deg, rgba(196,30,58,0.2) 0%, rgba(114,47,55,0.2) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .day-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        
+        .day-theme {
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        /* Audio Player */
+        .audio-player {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .audio-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--blood-red);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gold);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* Quiz Section */
+        .quiz-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .quiz-option.correct {
+            background: rgba(39, 174, 96, 0.3);
+            border-color: #27ae60;
+        }
+        
+        .quiz-option.wrong {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+        
+        .quiz-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Practical Info */
+        .info-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+        
+        .status-done {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #f39c12;
+            color: black;
+        }
+        
+        .status-christian {
+            background: var(--blood-red);
+            color: white;
+        }
+        
+        .status-nico {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26,26,26,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 15px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--gold);
+        }
+        
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+        
+        /* Warning */
+        .warning-box {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .warning-box strong {
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 380px) {
+            .day-title { font-size: 1rem; }
+            .player { min-width: 70px; padding: 8px; }
+            .player-score { font-size: 1.4rem; }
+        }
+        
+        /* Car Mode */
+        .car-mode {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--blood-red);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            z-index: 1001;
+            cursor: pointer;
+        }
+        
+        .car-mode-active .content-section {
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+        
+        .car-mode-active .quiz-option {
+            font-size: 1.2rem;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button class="car-mode" onclick="toggleCarMode()">🚗 BIL MODE</button>
+    
+    <div class="header">
+        <h1>🇪🇸 Spanien: Sår & Sten</h1>
+        <p>En rejse gennem modstand og magt</p>
+    </div>
+    
+    <!-- Score Board -->
+    <div class="score-board" id="scoreBoard">
+        <div class="player leader" data-player="christian">
+            <div class="player-name">Christian</div>
+            <div class="player-score" id="score-christian">0</div>
+        </div>
+        <div class="player" data-player="anders">
+            <div class="player-name">Anders</div>
+            <div class="player-score" id="score-anders">0</div>
+        </div>
+        <div class="player" data-player="nico">
+            <div class="player-name">Nico</div>
+            <div class="player-score" id="score-nico">0</div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('program')">📅 Program</button>
+        <button class="nav-tab" onclick="showSection('lyd')">🎧 Podcast</button>
+        <button class="nav-tab" onclick="showSection('quiz')">❓ Quiz</button>
+        <button class="nav-tab" onclick="showSection('praktisk')">📍 Info</button>
+    </div>
+    
+    <!-- PROGRAM SECTION -->
+    <div id="program" class="content-section active">
+        <div class="warning-box">
+            <strong>⚠️ VIGTIGT</strong>
+            De steder vi besøger er for mange spaniere kontroversielle. Vi omtaler IKKE vores planer offentligt under rejsen.
+        </div>
+        
+        <!-- Torsdag -->
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-title">Torsdag: Modstandens Tegn</div>
+                <div class="day-theme">Arbejderklassen</div>
+            </div>
+            <p style="margin-bottom: 15px; line-height: 1.5; opacity: 0.9;">
+                Puente de Vallecas – republikkens højborg. Fra Robert Capas ikoniske foto til nutidens "røde" barrio.
+            </p>
+            <div class="audio-player">
+                <div class="audio-title">🎙️ Podcast: Vallecas & Borgerkrigen</div>
+                <button class="play-btn" onclick="togglePlay(this, 'vallecas')">▶</button>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.7;">
+                    <span>0:00</span>
+                    <span>12:45</span>
+                </div>
+            </div>
+            <button onclick="startQuiz('torsdag')" style="width: 100%; padding: 12px; background: var(--blood-red); color: white; border: none; border-radius: 8px; font-weight: 600; margin-top: 10px;">
+                Start Torsdags-Quiz
+            </button>
+        </div>
+        
+        <!-- Fredag -->
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-title">Fredag: Undertrykkelsens Tegn</div>
+                <div class="day-theme">Diktaturet</div>
+            </div>
+            <p style="margin-bottom: 15px; line-height: 1.5; opacity: 0.9;">
+                Fra Francos grav i Mingorrubio til tvangsarbejdets monument i Valle de Cuelgamuros.
+            </p>
+            <div class="audio-player">
+                <div class="audio-title">🎙️ Podcast: Exhumeringen & Skyggen</div>
+                <button class="play-btn" onclick="togglePlay(this, 'franco')">▶</button>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.7;">
+                    <span>0:00</span>
+                    <span>18:30</span>
+                </div>
+            </div>
+            <div class="audio-player" style="margin-top: 10px;">
+                <div class="audio-title">🎙️ Podcast: Kirkens Rolle (Bil-kørsel)</div>
+                <button class="play-btn" onclick="togglePlay(this, 'kirke')">▶</button>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.7;">
+                    <span>0:00</span>
+                    <span>15:20</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lørdag -->
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-title">Lørdag: Vinens Tegn</div>
+                <div class="day-theme">Terroir & Genfødsel</div>
+            </div>
+            <p style="margin-bottom: 15px; line-height: 1.5; opacity: 0.9;">
+                Fra Francos kloster til granitjordens vine. Marañones og Gredos' bjergvine.
+            </p>
+            <div class="audio-player">
+                <div class="audio-title">🎙️ Podcast: Madrid DO & Granit</div>
+                <button class="play-btn" onclick="togglePlay(this, 'vin')">▶</button>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.7;">
+                    <span>0:00</span>
+                    <span>14:15</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Søndag -->
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-title">Søndag: Arenaens Tegn</div>
+                <div class="day-theme">Ritual & Politik</div>
+            </div>
+            <p style="margin-bottom: 15px; line-height: 1.5; opacity: 0.9;">
+                Las Ventas: Fra koncentrationslejr til kulturel bastion. Tyrefægtningens dobbelte historie.
+            </p>
+            <div class="audio-player">
+                <div class="audio-title">🎙️ Podcast: Las Ventas & Franco</div>
+                <button class="play-btn" onclick="togglePlay(this, 'ventas')">▶</button>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.7;">
+                    <span>0:00</span>
+                    <span>22:10</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- LYD SECTION -->
+    <div id="lyd" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">🎧 Alle Podcasts</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Perfekt til bilkørsel mellem destinationer. Husk: Lyt kun når I ikke skal navigere!</p>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">1. Intro: Hvorfor denne rejse?</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">8:45</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'intro')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">2. Vejen til Magten: Francos kynisme</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">16:20</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'vejen')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">3. Republikanerne vs. Nationalisterne</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">12:10</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'republikanere')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">4. Diktaturets Efterår: 1970'erne</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">19:45</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'efteraar')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">5. Arven: Et splittet Spanien</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">14:30</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'arven')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">6. Hemingway i Madrid</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">11:15</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'hemingway')">▶</button>
+        </div>
+        
+        <div class="audio-player">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="audio-title">7. ETA & Terrorismens Skygge</div>
+                <span style="font-size: 0.8rem; opacity: 0.6;">17:50</span>
+            </div>
+            <button class="play-btn" onclick="togglePlay(this, 'eta')">▶</button>
+        </div>
+    </div>
+    
+    <!-- QUIZ SECTION -->
+    <div id="quiz" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">❓ Reflektions-Quiz</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Quiz før og efter hvert sted. Hvem fanger dybden? Vælg spiller først:</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="setPlayer('christian')" id="btn-christian" style="flex: 1; padding: 12px; background: var(--blood-red); color: white; border: none; border-radius: 8px; font-weight: 600;">Christian</button>
+            <button onclick="setPlayer('anders')" id="btn-anders" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-weight: 600;">Anders</button>
+            <button onclick="setPlayer('nico')" id="btn-nico" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-weight: 600;">Nico</button>
+        </div>
+        
+        <div id="quiz-container" class="quiz-container">
+            <div class="quiz-question" id="quiz-question">
+                Vælg en dag ovenfor eller tryk "Tilfældig Quiz" for at starte!
+            </div>
+            <div class="quiz-options" id="quiz-options">
+                <button class="quiz-option" onclick="selectDayQuiz('torsdag')">Torsdag: Vallecas</button>
+                <button class="quiz-option" onclick="selectDayQuiz('fredag')">Fredag: Franco & Kirken</button>
+                <button class="quiz-option" onclick="selectDayQuiz('lordag')">Lørdag: Vin</button>
+                <button class="quiz-option" onclick="selectDayQuiz('sondag')">Søndag: Las Ventas</button>
+            </div>
+            <div id="quiz-result"></div>
+        </div>
+        
+        <button onclick="randomQuiz()" style="width: 100%; padding: 15px; background: var(--gold); color: var(--dark); border: none; border-radius: 8px; font-weight: 700; margin-top: 20px; font-size: 1.1rem;">
+            🎲 Tilfældig Quiz Spørgsmål
+        </button>
+    </div>
+    
+    <!-- PRAKTISK SECTION -->
+    <div id="praktisk" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">📍 Praktisk Information</h2>
+        
+        <h3 style="margin: 20px 0 10px 0; color: var(--blood-red);">🏨 Overnatning</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag – Puente de Vallecas</div>
+            <div class="info-value">Hospedaje Puente de Vallecas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle Sierra de Segura 2, 28038 Madrid</div>
+            <span class="status-badge status-christian">CHRISTIAN BOOKER</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag – Valle de Cuelgamuros</div>
+            <div class="info-value">Hospedería Santa Cruz</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Benediktinerklosteret</div>
+            <span class="status-badge status-pending">TIPS MARK BOOKER</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag – San Martín de Valdeiglesias</div>
+            <div class="info-value">Hospedería De La Tía María</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-nico">NICO BOOKER</span>
+            <div style="font-size: 0.8rem; margin-top: 8px; color: #f39c12;">
+                ⚠️ Bed dem booke 7 Capillas kl. 21 + hjælp til Marañones
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag – Madrid</div>
+            <div class="info-value">Hostal Golden Alcala</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-nico">NICO BOOKER</span>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🍽️ Restauranter & Bookinger</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag Aften – Puente de Vallecas</div>
+            <div class="info-value">El Asturiano</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Pablo Neruda 7, 28038 Madrid</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:00 | Start i baren</div>
+            <span class="status-badge status-christian">CHRISTIAN BOOKER</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                <a href="http://elasturiano1984.es" style="color: var(--gold);">elasturiano1984.es</a>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Morgen – Peironcely</div>
+            <div class="info-value">Tupay Bar Restaurante</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle de Peironcely 12, 28053 Madrid</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Desayuno i barrio-stil</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Aften – Valle de Cuelgamuros</div>
+            <div class="info-value">Hospedería Santa Cruz (middag)</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Traditionel casera mad</div>
+            <span class="status-badge status-pending">TIPS MARK BOOKER</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                <a href="http://hospederiasantacruz.es" style="color: var(--gold);">hospederiasantacruz.es</a>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag Aften – San Martín</div>
+            <div class="info-value">7 Capillas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:00 | Vin-nørderi</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Bed Tía María om hjælp til booking</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag Aften – Madrid</div>
+            <div class="info-value">Restaurante Puerta Grande</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:30 | Rabo de Toro</div>
+            <span class="status-badge status-done">NICO BOOKET ✓</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                <a href="https://puertagranderestaurante.es/" style="color: var(--gold);">puertagranderestaurante.es</a>
+            </div>
+            <div style="font-size: 0.8rem; margin-top: 5px; color: #27ae60;">
+                Gem bekræftelse – det er adgangspas efter kampen!
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🎯 Aktiviteter & Billetter</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 14:00 – Las Ventas Tour</div>
+            <div class="info-value">Adgang til Los Chiqueros, kapel, sygestue</div>
+            <span class="status-badge status-christian">CHRISTIAN BOOKER</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 18:00 – Korrida i Las Ventas</div>
+            <div class="info-value">Sol-følgende tid: 18-19</div>
+            <span class="status-badge status-done">NICO BOOKET ✓ (171€)</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag 13:00 – Bodega Marañones</div>
+            <div class="info-value">Ikke-standard turistvisning</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Marcial Llorente 69, Pelayos de la Presa</div>
+            <span class="status-badge status-pending">SKAL BOOKES</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                📞 +34 606 84 26 36<br>
+                ✉️ info@bodegamaranones.com
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">⛪ Fredag: Kloster & Messe</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Morgen – Laudes (morgenbøn)</div>
+            <div class="info-value">Kl. 08:15 – Kun ved invitation</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Spørg reception dagen før!</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Formiddag – Misa Conventual</div>
+            <div class="info-value">Kl. 11:00 – Basilikaen</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Gratis adgang | Mød op 10:30 ved taquillas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Gregoriansk sang</div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="showSection('program'); return false;">
+            <span class="nav-icon">📅</span>
+            <span>Program</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('lyd'); return false;">
+            <span class="nav-icon">🎧</span>
+            <span>Podcast</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('quiz'); return false;">
+            <span class="nav-icon">❓</span>
+            <span>Quiz</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showSection('praktisk'); return false;">
+            <span class="nav-icon">📍</span>
+            <span>Info</span>
+        </a>
+    </div>
+    
+    <script>
+        // State
+        let currentPlayer = 'christian';
+        let scores = { christian: 0, anders: 0, nico: 0 };
+        let currentQuiz = null;
+        let quizIndex = 0;
+        
+        // Quiz Database
+        const quizzes = {
+            torsdag: [
+                {
+                    q: "Hvad fotograferede Robert Capa ved Peironcely 10 den 20. november 1936?",
+                    options: ["En ødelagt tank", "Tre børn i ruinerne", "En matador i arenaen", "Franco ved graven"],
+                    correct: 1,
+                    points: 10
+                },
+                {
+                    q: "Hvad betyder 'barrio obrero'?",
+                    options: ["Turistkvarter", "Arbejderkvarter", "Finanskvarter", "Kirkekvarter"],
+                    correct: 1,
+                    points: 10
+                },
+                {
+                    q: "Hvorfor er Puente de Vallecas kontroversielt at besøge ifølge advarslen?",
+                    options: ["Det er for turistet", "Det er stadig et politisk ladet sted for mange spaniere", "Det er for dyrt", "Det er lukket for offentligheden"],
+                    correct: 1,
+                    points: 15
+                }
+            ],
+            fredag: [
+                {
+                    q: "Hvor ligger Francisco Franco begravet i dag?",
+                    options: ["Valle de los Caídos", "Cementerio Municipal de Mingorrubio", "El Escorial", "Han er kremeret"],
+                    correct: 1,
+                    points: 10
+                },
+                {
+                    q: "Hvad var 'redención de penas por el trabajo'?",
+                    options: ["En ferieordning", "Tvangsarbejde for politiske fanger", "En skattefritagelse", "En militær medalje"],
+                    correct: 1,
+                    points: 15
+                },
+                {
+                    q: "Hvilket år blev Franco exhumeret (flyttet) fra Valle de los Caídos?",
+                    options: ["2019", "1975", "2007", "2022"],
+                    correct: 0,
+                    points: 15
+                }
+            ],
+            lordag: [
+                {
+                    q: "Hvad er særligt ved jorden hos Bodega Marañones?",
+                    options: ["Den er ler-baseret", "Den er granit-baseret", "Den er vulkansk", "Den er importeret"],
+                    correct: 1,
+                    points: 10
+                },
+                {
+                    q: "Hvilken drue er Marañones mest kendt for at genopdage?",
+                    options: ["Tempranillo", "Garnacha", "Albillo Real", "Airén"],
+                    correct: 1,
+                    points: 10
+                },
+                {
+                    q: "Hvad betyder DO i Madrid DO?",
+                    options: ["Denominación de Origen", "Direktiv Ordning", "Dansk Område", "Dybdegående Oplysning"],
+                    correct: 0,
+                    points: 10
+                }
+            ],
+            sondag: [
+                {
+                    q: "Hvad blev Las Ventas brugt til i 1939 udover tyrefægtning?",
+                    options: ["Koncentrationslejr for republikanske fanger", "Franco's residens", "Kirke", "Skole"],
+                    correct: 0,
+                    points: 15
+                },
+                {
+                    q: "Hvad er 'La Corrida de la Victoria'?",
+                    options: ["En moderne festival", "En sejrs-korrida i maj 1939", "En fredsdemonstration", "En religiøs ceremoni"],
+                    correct: 1,
+                    points: 15
+                },
+                {
+                    q: "Hvad er 'Los Chiqueros'?",
+                    options: ["En restaurant", "Stalde/venterum for tyre – også brugt som isolationsceller", "En bar", "En kirke"],
+                    correct: 1,
+                    points: 15
+                }
+            ]
+        };
+        
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            event.target.classList.add('active');
+        }
+        
+        // Car Mode
+        function toggleCarMode() {
+            document.body.classList.toggle('car-mode-active');
+            const btn = document.querySelector('.car-mode');
+            btn.textContent = document.body.classList.contains('car-mode-active') ? '🚗 BIL MODE: ON' : '🚗 BIL MODE';
+        }
+        
+        // Audio Player Simulation
+        function togglePlay(btn, track) {
+            const isPlaying = btn.textContent === '⏸';
+            
+            // Stop all others
+            document.querySelectorAll('.play-btn').forEach(b => {
+                b.textContent = '▶';
+                b.closest('.audio-player').querySelector('.progress-fill').style.width = '0%';
+            });
+            
+            if (!isPlaying) {
+                btn.textContent = '⏸';
+                // Simulate progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    if (btn.textContent !== '⏸') {
+                        clearInterval(interval);
+                        return;
+                    }
+                    progress += 1;
+                    btn.closest('.audio-player').querySelector('.progress-fill').style.width = progress + '%';
+                    if (progress >= 100) {
+                        btn.textContent = '▶';
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+        }
+        
+        // Quiz Functions
+        function setPlayer(player) {
+            currentPlayer = player;
+            document.querySelectorAll('[id^="btn-"]').forEach(b => {
+                b.style.background = 'rgba(255,255,255,0.1)';
+                b.style.border = '2px solid rgba(255,255,255,0.3)';
+            });
+            document.getElementById('btn-' + player).style.background = 'var(--blood-red)';
+            document.getElementById('btn-' + player).style.border = 'none';
+        }
+        
+        function selectDayQuiz(day) {
+            currentQuiz = quizzes[day];
+            quizIndex = 0;
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            if (!currentQuiz || quizIndex >= currentQuiz.length) {
+                document.getElementById('quiz-question').textContent = 'Quizzen er færdig! Godt arbejde.';
+                document.getElementById('quiz-options').innerHTML = '<button class="quiz-option" onclick="randomQuiz()">Ny Quiz</button>';
+                return;
+            }
+            
+            const q = currentQuiz[quizIndex];
+            document.getElementById('quiz-question').textContent = q.q;
+            
+            let html = '';
+            q.options.forEach((opt, i) => {
+                html += `<button class="quiz-option" onclick="checkAnswer(${i}, ${q.correct}, ${q.points})">${opt}</button>`;
+            });
+            document.getElementById('quiz-options').innerHTML = html;
+            document.getElementById('quiz-result').innerHTML = '';
+        }
+        
+        function checkAnswer(selected, correct, points) {
+            const options = document.querySelectorAll('.quiz-option');
+            options[selected].classList.add(selected === correct ? 'correct' : 'wrong');
+            if (correct !== selected) options[correct].classList.add('correct');
+            
+            if (selected === correct) {
+                scores[currentPlayer] += points;
+                updateScoreboard();
+                document.getElementById('quiz-result').innerHTML = `<div class="quiz-result" style="background: rgba(39, 174, 96, 0.2); color: #27ae60;">✓ Korrekt! +${points} point</div>`;
+            } else {
+                document.getElementById('quiz-result').innerHTML = `<div class="quiz-result" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c;">✗ Forkert. Det rigtige svar er markeret.</div>`;
+            }
+            
+            setTimeout(() => {
+                quizIndex++;
+                showQuestion();
+            }, 2000);
+        }
+        
+        function randomQuiz() {
+            const allQuestions = [];
+            Object.values(quizzes).forEach(day => {
+                day.forEach(q => allQuestions.push(q));
+            });
+            const randomQ = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+            
+            document.getElementById('quiz-question').textContent = '🎲 ' + randomQ.q;
+            
+            let html = '';
+            randomQ.options.forEach((opt, i) => {
+                html += `<button class="quiz-option" onclick="checkRandomAnswer(${i}, ${randomQ.correct}, ${randomQ.points})">${opt}</button>`;
+            });
+            document.getElementById('quiz-options').innerHTML = html;
+            document.getElementById('quiz-result').innerHTML = '';
+        }
+        
+        function checkRandomAnswer(selected, correct, points) {
+            const options = document.querySelectorAll('.quiz-option');
+            options[selected].classList.add(selected === correct ? 'correct' : 'wrong');
+            if (correct !== selected) options[correct].classList.add('correct');
+            
+            if (selected === correct) {
+                scores[currentPlayer] += points;
+                updateScoreboard();
+                document.getElementById('quiz-result').innerHTML = `<div class="quiz-result" style="background: rgba(39, 174, 96, 0.2); color: #27ae60;">✓ Korrekt! +${points} point til ${currentPlayer}!</div>`;
+            } else {
+                document.getElementById('quiz-result').innerHTML = `<div class="quiz-result" style="background: rgba(231, 76, 60, 0.2); color: #e74c3c;">✗ Forkert. Prøv igen med Tilfældig Quiz!</div>`;
+            }
+        }
+        
+        function updateScoreboard() {
+            document.getElementById('score-christian').textContent = scores.christian;
+            document.getElementById('score-anders').textContent = scores.anders;
+            document.getElementById('score-nico').textContent = scores.nico;
+            
+            // Find leader
+            const max = Math.max(scores.christian, scores.anders, scores.nico);
+            document.querySelectorAll('.player').forEach(p => p.classList.remove('leader'));
+            if (scores.christian === max) document.querySelector('[data-player="christian"]').classList.add('leader');
+            if (scores.anders === max) document.querySelector('[data-player="anders"]').classList.add('leader');
+            if (scores.nico === max) document.querySelector('[data-player="nico"]').classList.add('leader');
+        }
+        
+        // Initialize
+        updateScoreboard();
+    </script>
+</body>
+</html>
