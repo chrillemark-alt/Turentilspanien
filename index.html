@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+    <title>Spanien Sår & Sten</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --blood-red: #c41e3a;
+            --granite: #4a4a4a;
+            --wine: #722f37;
+            --gold: #d4af37;
+            --dark: #1a1a1a;
+            --light: #f5f5f5;
+            --paper: #f4f1ea;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+        
+        /* Countdown Banner */
+        .countdown-banner {
+            background: linear-gradient(90deg, var(--blood-red), var(--wine));
+            padding: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 101;
+        }
+        
+        .countdown-timer {
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-top: 4px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--blood-red) 0%, var(--wine) 100%);
+            padding: 20px;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        
+        /* Score Board */
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .player {
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            min-width: 80px;
+        }
+        
+        .player.leader {
+            background: var(--gold);
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+        
+        .player-name {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .player-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding: 15px;
+            background: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            background: var(--blood-red);
+            font-weight: 600;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+            min-height: 100vh;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Day Detail Page */
+        .day-detail {
+            display: none;
+            animation: slideIn 0.3s;
+        }
+        
+        .day-detail.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .day-hero {
+            background: linear-gradient(135deg, rgba(196,30,58,0.3) 0%, rgba(114,47,55,0.3) 100%);
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .day-hero h2 {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
+        .day-hero .theme {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        .day-hero .date {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+        
+        /* Image Gallery */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .image-placeholder {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        
+        .image-placeholder.main {
+            grid-column: 1 / -1;
+            aspect-ratio: 21/9;
+        }
+        
+        /* Article Section */
+        .article-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .article-section h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .article-content {
+            line-height: 1.8;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .article-content p {
+            margin-bottom: 15px;
+        }
+        
+        .read-more-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--blood-red);
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        /* Audio Player - FIXED */
+        .audio-player {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .audio-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .audio-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--blood-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .audio-info {
+            flex: 1;
+        }
+        
+        .audio-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        
+        .audio-duration {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--blood-red);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn.playing {
+            background: var(--gold);
+            color: var(--dark);
+        }
+        
+        .progress-container {
+            flex: 1;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gold);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        /* Newspaper Archive */
+        .newspaper-section {
+            background: var(--paper);
+            color: var(--dark);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .newspaper-section h3 {
+            color: var(--blood-red);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .newspaper-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .newspaper-item:active {
+            transform: scale(0.98);
+        }
+        
+        .newspaper-date {
+            font-size: 0.8rem;
+            color: var(--blood-red);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .newspaper-headline {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: Georgia, serif;
+        }
+        
+        .newspaper-preview {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        /* Map Section */
+        .map-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .map-section h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .map-placeholder {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(39,174,96,0.2), rgba(39,174,96,0.1));
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px dashed rgba(39,174,96,0.3);
+            margin-bottom: 15px;
+        }
+        
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #4285f4;
+            color: white;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        /* Status Tracking */
+        .status-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .status-section h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .status-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .status-info p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-confirmed {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #f39c12;
+            color: black;
+        }
+        
+        .status-action {
+            background: var(--blood-red);
+            color: white;
+        }
+        
+        /* AI Chat */
+        .ai-chat-section {
+            background: linear-gradient(135deg, rgba(66,133,244,0.2), rgba(66,133,244,0.1));
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(66,133,244,0.3);
+        }
+        
+        .ai-chat-section h3 {
+            color: #4285f4;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-messages {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .ai-message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .ai-message.bot {
+            background: rgba(66,133,244,0.3);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .ai-message.user {
+            background: rgba(255,255,255,0.15);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .ai-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 0.95rem;
+        }
+        
+        .ai-input input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .ai-input button {
+            padding: 12px 20px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .quick-action {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s;
+        }
+        
+        .quick-action:active {
+            transform: scale(0.98);
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .quick-action-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        /* Day Cards (Overview) */
+        .day-card {
+            background: linear-gradient(135deg, rgba(196,30,58,0.2) 0%, rgba(114,47,55,0.2) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .day-card:active {
+            transform: scale(0.98);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .day-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        
+        .day-theme {
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .day-preview {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .day-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .day-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Warning */
+        .warning-box {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .warning-box strong {
+            color: #e74c3c;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Practical Info */
+        .info-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Quiz Section */
+        .quiz-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            text-align: left;
+            color: white;
+        }
+        
+        .quiz-option.correct {
+            background: rgba(39, 174, 96, 0.3);
+            border-color: #27ae60;
+        }
+        
+        .quiz-option.wrong {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26,26,26,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 15px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: var(--gold);
+        }
+        
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+        
+        /* Car Mode */
+        .car-mode {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            background: var(--blood-red);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            z-index: 1001;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .car-mode-active {
+            font-size: 1.3rem;
+        }
+        
+        .car-mode-active .day-hero h2 {
+            font-size: 2.2rem;
+        }
+        
+        .car-mode-active .article-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+        
+        /* Modal for full article */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--dark);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-close {
+            position: sticky;
+            top: 20px;
+            float: right;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 2001;
+        }
+        
+        .modal-content {
+            max-width: 800px;
+            margin: 60px auto 20px;
+            line-height: 1.8;
+        }
+        
+        .modal-content h2 {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .modal-content p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="car-mode" onclick="toggleCarMode()">🚗 BIL</button>
+    
+    <!-- Countdown Banner -->
+    <div class="countdown-banner">
+        <div>Afrejse om:</div>
+        <div class="countdown-timer" id="countdown">Beregn...</div>
+    </div>
+    
+    <div class="header">
+        <h1>🇪🇸 Spanien: Sår & Sten</h1>
+        <p>En rejse gennem modstand og magt</p>
+    </div>
+    
+    <!-- Score Board -->
+    <div class="score-board" id="scoreBoard">
+        <div class="player leader" data-player="christian">
+            <div class="player-name">Christian</div>
+            <div class="player-score" id="score-christian">0</div>
+        </div>
+        <div class="player" data-player="anders">
+            <div class="player-name">Anders</div>
+            <div class="player-score" id="score-anders">0</div>
+        </div>
+        <div class="player" data-player="nico">
+            <div class="player-name">Nico</div>
+            <div class="player-score" id="score-nico">0</div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('program')">📅 Program</button>
+        <button class="nav-tab" onclick="showSection('lyd')">🎧 Podcast</button>
+        <button class="nav-tab" onclick="showSection('quiz')">❓ Quiz</button>
+        <button class="nav-tab" onclick="showSection('praktisk')">📍 Info</button>
+    </div>
+    
+    <!-- PROGRAM SECTION -->
+    <div id="program" class="content-section active">
+        <div class="warning-box">
+            <strong>⚠️ VIGTIGT</strong>
+            De steder vi besøger er for mange spaniere kontroversielle. Vi omtaler IKKE vores planer offentligt under rejsen.
+        </div>
+        
+        <!-- Torsdag Card -->
+        <div class="day-card" onclick="showDayDetail('torsdag')">
+            <div class="day-header">
+                <div class="day-title">Torsdag</div>
+                <div class="day-theme">Modstandens Tegn</div>
+            </div>
+            <div class="day-preview">
+                Puente de Vallecas – republikkens højborg. Fra Robert Capas ikoniske foto til nutidens "røde" barrio.
+            </div>
+            <div class="day-meta">
+                <span>📍 Madrid</span>
+                <span>🎧 2 podcasts</span>
+                <span>❓ 3 quiz</span>
+            </div>
+        </div>
+        
+        <!-- Fredag Card -->
+        <div class="day-card" onclick="showDayDetail('fredag')">
+            <div class="day-header">
+                <div class="day-title">Fredag</div>
+                <div class="day-theme">Undertrykkelsens Tegn</div>
+            </div>
+            <div class="day-preview">
+                Fra Francos grav i Mingorrubio til tvangsarbejdets monument i Valle de Cuelgamuros.
+            </div>
+            <div class="day-meta">
+                <span>📍 Madrid → Sierra</span>
+                <span>🎧 3 podcasts</span>
+                <span>⛪ Kloster</span>
+            </div>
+        </div>
+        
+        <!-- Lørdag Card -->
+        <div class="day-card" onclick="showDayDetail('lordag')">
+            <div class="day-header">
+                <div class="day-title">Lørdag</div>
+                <div class="day-theme">Vinens Tegn</div>
+            </div>
+            <div class="day-preview">
+                Fra Francos kloster til granitjordens vine. Marañones og Gredos' bjergvine.
+            </div>
+            <div class="day-meta">
+                <span>📍 San Martín</span>
+                <span>🍷 Vingård</span>
+                <span>🎧 1 podcast</span>
+            </div>
+        </div>
+        
+        <!-- Søndag Card -->
+        <div class="day-card" onclick="showDayDetail('sondag')">
+            <div class="day-header">
+                <div class="day-title">Søndag</div>
+                <div class="day-theme">Arenaens Tegn</div>
+            </div>
+            <div class="day-preview">
+                Las Ventas: Fra koncentrationslejr til kulturel bastion. Tyrefægtningens dobbelte historie.
+            </div>
+            <div class="day-meta">
+                <span>📍 Madrid</span>
+                <span>🐂 Tyrefægtning</span>
+                <span>🎧 2 podcasts</span>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <h3 style="margin: 25px 0 15px; color: var(--gold);">Hurtige handlinger</h3>
+        <div class="quick-actions">
+            <a href="#" class="quick-action" onclick="startGroupQuiz(); return false;">
+                <div class="quick-action-icon">🏆</div>
+                <div class="quick-action-label">Gruppe Quiz</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('ai'); return false;">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-label">Spørg AI</div>
+            </a>
+            <a href="https://maps.google.com/?q=Puente+de+Vallecas,Madrid" class="quick-action" target="_blank">
+                <div class="quick-action-icon">🗺️</div>
+                <div class="quick-action-label">Næste sted</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('status'); return false;">
+                <div class="quick-action-icon">✅</div>
+                <div class="quick-action-label">Status</div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- DAY DETAIL: TORSDAG -->
+    <div id="day-torsdag" class="day-detail">
+        <button class="back-btn" onclick="hideDayDetail()">← Tilbage</button>
+        
+        <div class="day-hero">
+            <h2>Torsdag</h2>
+            <div class="theme">I Modstandens Tegn</div>
+            <div class="date">17. april 2025</div>
+        </div>
+        
+        <!-- Images -->
+        <div class="image-gallery">
+            <div class="image-placeholder main">📸 Peironcely 10 (tilføj billede)</div>
+            <div class="image-placeholder">🏠 Vallecas</div>
+            <div class="image-placeholder">🍽️ El Asturiano</div>
+        </div>
+        
+        <!-- Article -->
+        <div class="article-section">
+            <h3>📖 Artikel: Arbejdernes Spanien</h3>
+            <div class="article-content">
+                <p>Puente de Vallecas var et af de mest ikoniske arbejderkvarterer under borgerkrigen. Strategisk placeret sydøst for centrum, nær floden Manzanares...</p>
+                <p>Den 20. november 1936 fotograferede Robert Capa tre børn i ruinerne foran Peironcely 10. Billedet blev et globalt symbol på fascismens angreb på uskyldige...</p>
+            </div>
+            <button class="read-more-btn" onclick="showFullArticle('torsdag')">Læs hele artiklen</button>
+        </div>
+        
+        <!-- Podcasts -->
+        <div class="article-section">
+            <h3>🎧 Podcasts</h3>
+            <div class="audio-player" data-audio="vallecas-intro">
+                <div class="audio-header">
+                    <div class="audio-icon">🎙️</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Vallecas & Borgerkrigen</div>
+                        <div class="audio-duration">12:45</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'vallecas-intro')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>12:45</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="audio-player" data-audio="capa-photo">
+                <div class="audio-header">
+                    <div class="audio-icon">📷</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Robert Capas fotografi</div>
+                        <div class="audio-duration">8:30</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'capa-photo')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>8:30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Newspaper Archive -->
+        <div class="newspaper-section">
+            <h3>📰 Avisarkiv</h3>
+            <div class="newspaper-item" onclick="showNewspaper('nov1936')">
+                <div class="newspaper-date">20. november 1936</div>
+                <div class="newspaper-headline">"Madrid under belejring"</div>
+                <div class="newspaper-preview">Den republikanske avis Información rapporterer om daglige bombardementer i arbejderkvartererne...</div>
+            </div>
+            <div class="newspaper-item" onclick="showNewspaper('apr1939')">
+                <div class="newspaper-date">1. april 1939</div>
+                <div class="newspaper-headline">"Sejren er total"</div>
+                <div class="newspaper-preview">Nationalistisk avis fejrer krigens afslutning og Francos magtovertagelse...</div>
+            </div>
+        </div>
+        
+        <!-- Map -->
+        <div class="map-section">
+            <h3>🗺️ Navigation</h3>
+            <div class="map-placeholder">
+                <span style="font-size: 3rem;">🗺️</span>
+                <span>Google Maps integration</span>
+            </div>
+            <a href="https://maps.google.com/?q=Hospedaje+Puente+de+Vallecas,Calle+Sierra+de+Segura+2,Madrid" class="map-btn" target="_blank">
+                🚗 Kør til hotel
+            </a>
+            <a href="https://maps.google.com/?q=El+Asturiano,Avenida+Pablo+Neruda+7,Madrid" class="map-btn" target="_blank" style="margin-top: 10px; background: var(--blood-red);">
+                🍽️ Kør til restaurant
+            </a>
+        </div>
+        
+        <!-- Status -->
+        <div class="status-section">
+            <h3>✅ Booking Status</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedaje Puente de Vallecas</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ El Asturiano</h4>
+                    <p>Bord kl. 21:00</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+        </div>
+        
+        <!-- AI Chat for this day -->
+        <div class="ai-chat-section">
+            <h3>🤖 Spørg om Torsdag</h3>
+            <div class="ai-messages" id="ai-messages-torsdag">
+                <div class="ai-message bot">Jeg kan svare på spørgsmål om Vallecas, borgerkrigen og Robert Capa. Hvad vil du vide?</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-torsdag" onkeypress="handleAIInput(event, 'torsdag')">
+                <button onclick="sendAIMessage('torsdag')">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DAY DETAIL: FREDAG -->
+    <div id="day-fredag" class="day-detail">
+        <button class="back-btn" onclick="hideDayDetail()">← Tilbage</button>
+        
+        <div class="day-hero">
+            <h2>Fredag</h2>
+            <div class="theme">I Undertrykkelsens Tegn</div>
+            <div class="date">18. april 2025</div>
+        </div>
+        
+        <div class="image-gallery">
+            <div class="image-placeholder main">⚰️ Francos grav</div>
+            <div class="image-placeholder">⛪ Valle de Cuelgamuros</div>
+            <div class="image-placeholder">🙏 Benediktinerkloster</div>
+        </div>
+        
+        <div class="article-section">
+            <h3>📖 Artikel: Diktaturets Anatomi</h3>
+            <div class="article-content">
+                <p>Francisco Franco døde den 20. november 1975, men hans arv lever stadig. I 2019 blev hans lig exhumeret fra Valle de los Caídos...</p>
+                <p>Monumentet i Sierra de Guadarrama blev bygget af tvangsarbejdende republikanske fanger mellem 1940-1959...</p>
+            </div>
+            <button class="read-more-btn" onclick="showFullArticle('fredag')">Læs hele artiklen</button>
+        </div>
+        
+        <div class="article-section">
+            <h3>🎧 Podcasts</h3>
+            <div class="audio-player" data-audio="franco-exhume">
+                <div class="audio-header">
+                    <div class="audio-icon">⚰️</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Exhumeringen af Franco</div>
+                        <div class="audio-duration">18:30</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'franco-exhume')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>18:30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="audio-player" data-audio="kirke-rolle">
+                <div class="audio-header">
+                    <div class="audio-icon">⛪</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Kirkens Rolle under Fascismen</div>
+                        <div class="audio-duration">15:20</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'kirke-rolle')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>15:20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="audio-player" data-audio="tvangsarbejde">
+                <div class="audio-header">
+                    <div class="audio-icon">⛓️</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Tvangsarbejde i Valle de los Caídos</div>
+                        <div class="audio-duration">22:15</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'tvangsarbejde')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>22:15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="newspaper-section">
+            <h3>📰 Avisarkiv</h3>
+            <div class="newspaper-item" onclick="showNewspaper('nov1975')">
+                <div class="newspaper-date">20. november 1975</div>
+                <div class="newspaper-headline">"Franco er død"</div>
+                <div class="newspaper-preview">ABC rapporterer om diktatorens død og overgangen til Juan Carlos...</div>
+            </div>
+            <div class="newspaper-item" onclick="showNewspaper('okt2019')">
+                <div class="newspaper-date">24. oktober 2019</div>
+                <div class="newspaper-headline">"Franco flyttes i hemmelighed"</div>
+                <div class="newspaper-preview">El País beskriver den kontroversielle exhumering under politibeskyttelse...</div>
+            </div>
+        </div>
+        
+        <div class="map-section">
+            <h3>🗺️ Navigation</h3>
+            <div class="map-placeholder">
+                <span style="font-size: 3rem;">🗺️</span>
+                <span>Dagens rute: 3 stop</span>
+            </div>
+            <a href="https://maps.google.com/?q=Cementerio+Municipal+de+Mingorrubio,Madrid" class="map-btn" target="_blank" style="margin-bottom: 10px;">
+                1️⃣ Francos grav
+            </a>
+            <a href="https://maps.google.com/?q=Valle+de+los+Caidos,San+Lorenzo+de+El+Escorial" class="map-btn" target="_blank" style="margin-bottom: 10px; background: var(--blood-red);">
+                2️⃣ Valle de Cuelgamuros
+            </a>
+            <a href="https://maps.google.com/?q=Hospederia+Santa+Cruz,Valle+de+los+Caidos" class="map-btn" target="_blank" style="background: #27ae60;">
+                3️⃣ Hotel & Middag
+            </a>
+        </div>
+        
+        <div class="status-section">
+            <h3>✅ Booking Status</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>☕ Tupay Bar (Morgenmad)</h4>
+                    <p>Ved Peironcely 10</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ Walk-in</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>⛪ Hospedería Santa Cruz</h4>
+                    <p>3 værelser + middag</p>
+                </div>
+                <span class="status-badge status-pending">TIPS MARK</span>
+            </div>
+        </div>
+        
+        <div class="ai-chat-section">
+            <h3>🤖 Spørg om Fredag</h3>
+            <div class="ai-messages" id="ai-messages-fredag">
+                <div class="ai-message bot">Spørg mig om Franco, exhumeringen, kirkens rolle eller klosterlivet. Jeg kender historien!</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-fredag" onkeypress="handleAIInput(event, 'fredag')">
+                <button onclick="sendAIMessage('fredag')">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DAY DETAIL: LØRDAG -->
+    <div id="day-lordag" class="day-detail">
+        <button class="back-btn" onclick="hideDayDetail()">← Tilbage</button>
+        
+        <div class="day-hero">
+            <h2>Lørdag</h2>
+            <div class="theme">I Vinens Tegn</div>
+            <div class="date">19. april 2025</div>
+        </div>
+        
+        <div class="image-gallery">
+            <div class="image-placeholder main">🍇 Marañones vingård</div>
+            <div class="image-placeholder">🏔️ Sierra de Gredos</div>
+            <div class="image-placeholder">🍷 7 Capillas</div>
+        </div>
+        
+        <div class="article-section">
+            <h3>📖 Artikel: Granit og Genfødsel</h3>
+            <div class="article-content">
+                <p>San Martín de Valdeiglesias er "granit-terroirets hovedstad". Her finder vi Bodega Marañones, der har genoplivet gamle Garnacha-vinmarker...</p>
+                <p>Jordbunden af nedbrudt granit tvinger vinstokkernes rødder dybt ned og giver vinene en karakteristisk friskhed...</p>
+            </div>
+            <button class="read-more-btn" onclick="showFullArticle('lordag')">Læs hele artiklen</button>
+        </div>
+        
+        <div class="article-section">
+            <h3>🎧 Podcasts</h3>
+            <div class="audio-player" data-audio="madrid-do">
+                <div class="audio-header">
+                    <div class="audio-icon">🍷</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Madrid DO & Granitterroir</div>
+                        <div class="audio-duration">14:15</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'madrid-do')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>14:15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="newspaper-section">
+            <h3>📰 Avisarkiv</h3>
+            <div class="newspaper-item" onclick="showNewspaper('vin1990')">
+                <div class="newspaper-date">1990</div>
+                <div class="newspaper-headline">"Madrid DO oprettes"</div>
+                <div class="newspaper-preview">Efter årtiers glemsel får Madrid-regionen officiel vinstatus...</div>
+            </div>
+        </div>
+        
+        <div class="map-section">
+            <h3>🗺️ Navigation</h3>
+            <div class="map-placeholder">
+                <span style="font-size: 3rem;">🗺️</span>
+                <span>70 km fra Madrid</span>
+            </div>
+            <a href="https://maps.google.com/?q=Bodega+Maranones,San+Martin+de+Valdeiglesias" class="map-btn" target="_blank" style="margin-bottom: 10px;">
+                🍇 Marañones (kl. 13)
+            </a>
+            <a href="https://maps.google.com/?q=7+Capillas,San+Martin+de+Valdeiglesias" class="map-btn" target="_blank" style="background: var(--blood-red);">
+                🍽️ 7 Capillas (kl. 21)
+            </a>
+        </div>
+        
+        <div class="status-section">
+            <h3>✅ Booking Status</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedería De La Tía María</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍇 Bodega Marañones</h4>
+                    <p>Rundvisning kl. 13:00</p>
+                </div>
+                <span class="status-badge status-action">📞 BOOKES</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ 7 Capillas</h4>
+                    <p>Bord kl. 21:00</p>
+                </div>
+                <span class="status-badge status-pending">Via Tía María</span>
+            </div>
+        </div>
+        
+        <div class="ai-chat-section">
+            <h3>🤖 Spørg om Lørdag</h3>
+            <div class="ai-messages" id="ai-messages-lordag">
+                <div class="ai-message bot">Spørg om Garnacha druen, granitjord, Madrid DO eller vinmarkerne i Gredos!</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-lordag" onkeypress="handleAIInput(event, 'lordag')">
+                <button onclick="sendAIMessage('lordag')">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DAY DETAIL: SØNDAG -->
+    <div id="day-sondag" class="day-detail">
+        <button class="back-btn" onclick="hideDayDetail()">← Tilbage</button>
+        
+        <div class="day-hero">
+            <h2>Søndag</h2>
+            <div class="theme">I Arenaens Tegn</div>
+            <div class="date">20. april 2025</div>
+        </div>
+        
+        <div class="image-gallery">
+            <div class="image-placeholder main">🐂 Las Ventas</div>
+            <div class="image-placeholder">⚔️ Tyrefægtning</div>
+            <div class="image-placeholder">🍖 Rabo de Toro</div>
+        </div>
+        
+        <div class="article-section">
+            <h3>📖 Artikel: Ritual og Politik</h3>
+            <div class="article-content">
+                <p>Las Ventas var ikke altid en arena for underholdning. I 1939 blev den transformeret til koncentrationslejr for republikanske fanger...</p>
+                <p>Den 24. maj 1939 afholdt Franco "La Corrida de la Victoria" – en sejrs-korrida der skulle symbolisere hans totale magtovertagelse...</p>
+            </div>
+            <button class="read-more-btn" onclick="showFullArticle('sondag')">Læs hele artiklen</button>
+        </div>
+        
+        <div class="article-section">
+            <h3>🎧 Podcasts</h3>
+            <div class="audio-player" data-audio="ventas-historie">
+                <div class="audio-header">
+                    <div class="audio-icon">🐂</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Las Ventas & Franco</div>
+                        <div class="audio-duration">22:10</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'ventas-historie')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>22:10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="audio-player" data-audio="corrida-ritual">
+                <div class="audio-header">
+                    <div class="audio-icon">🎯</div>
+                    <div class="audio-info">
+                        <div class="audio-title">Tyrefægtningens Ritualer</div>
+                        <div class="audio-duration">16:45</div>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <button class="play-btn" onclick="toggleAudio(this, 'corrida-ritual')">▶</button>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekAudio(event, this)">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span>
+                            <span>16:45</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="newspaper-section">
+            <h3>📰 Avisarkiv</h3>
+            <div class="newspaper-item" onclick="showNewspaper('maj1939')">
+                <div class="newspaper-date">24. maj 1939</div>
+                <div class="newspaper-headline">"Sejren fejres i Las Ventas"</div>
+                <div class="newspaper-preview">ABC beskriver den første korrida efter krigen, hvor Franco selv var til stede...</div>
+            </div>
+            <div class="newspaper-item" onclick="showNewspaper('apr2024')">
+                <div class="newspaper-date">2024</div>
+                <div class="newspaper-headline">"Debatten om tyrefægtning deler Spanien"</div>
+                <div class="newspaper-preview">El País undersøger hvorfor den gamle tradition stadig skaber kontrovers...</div>
+            </div>
+        </div>
+        
+        <div class="map-section">
+            <h3>🗺️ Navigation</h3>
+            <div class="map-placeholder">
+                <span style="font-size: 3rem;">🗺️</span>
+                <span>Dagens program</span>
+            </div>
+            <a href="https://maps.google.com/?q=Plaza+de+Toros+Las+Ventas,Madrid" class="map-btn" target="_blank" style="margin-bottom: 10px;">
+                1️⃣ Las Ventas Tour (14:00)
+            </a>
+            <a href="https://maps.google.com/?q=Taberna+La+Tienta,Madrid" class="map-btn" target="_blank" style="margin-bottom: 10px; background: var(--blood-red);">
+                2️⃣ La Tienta (efter tour)
+            </a>
+            <a href="https://maps.google.com/?q=Restaurante+Puerta+Grande,Madrid" class="map-btn" target="_blank" style="background: #27ae60;">
+                3️⃣ Puerta Grande (21:30)
+            </a>
+        </div>
+        
+        <div class="status-section">
+            <h3>✅ Booking Status</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🐂 Las Ventas Tour</h4>
+                    <p>Kl. 14:00 - Los Chiqueros</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🎫 Korrida billetter</h4>
+                    <p>Kl. 18-19 (sol)</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO (171€)</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ Puerta Grande</h4>
+                    <p>Bord kl. 21:30 - Rabo de Toro</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hostal Golden Alcala</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+        </div>
+        
+        <div class="ai-chat-section">
+            <h3>🤖 Spørg om Søndag</h3>
+            <div class="ai-messages" id="ai-messages-sondag">
+                <div class="ai-message bot">Spørg om Las Ventas' historie, tyrefægtningens ritualer, eller Los Chiqueros som fangelejr!</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-sondag" onkeypress="handleAIInput(event, 'sondag')">
+                <button onclick="sendAIMessage('sondag')">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FULL ARTICLE MODAL -->
+    <div id="article-modal" class="modal">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="modal-content" id="modal-content">
+            <!-- Content loaded dynamically -->
+        </div>
+    </div>
+    
+    <!-- PODCAST SECTION -->
+    <div id="lyd" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">🎧 Alle Podcasts</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Perfekt til bilkørsel mellem destinationer. Husk: Lyt kun når I ikke skal navigere!</p>
+        
+        <div class="audio-player" data-audio="intro">
+            <div class="audio-header">
+                <div class="audio-icon">🎬</div>
+                <div class="audio-info">
+                    <div class="audio-title">Intro: Hvorfor denne rejse?</div>
+                    <div class="audio-duration">8:45</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'intro')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>8:45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="vejen">
+            <div class="audio-header">
+                <div class="audio-icon">👑</div>
+                <div class="audio-info">
+                    <div class="audio-title">Vejen til Magten: Francos kynisme</div>
+                    <div class="audio-duration">16:20</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'vejen')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>16:20</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="republikanere">
+            <div class="audio-header">
+                <div class="audio-icon">⚔️</div>
+                <div class="audio-info">
+                    <div class="audio-title">Republikanerne vs. Nationalisterne</div>
+                    <div class="audio-duration">12:10</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'republikanere')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>12:10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="efteraar">
+            <div class="audio-header">
+                <div class="audio-icon">🍂</div>
+                <div class="audio-info">
+                    <div class="audio-title">Diktaturets Efterår: 1970'erne</div>
+                    <div class="audio-duration">19:45</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'efteraar')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>19:45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="arven">
+            <div class="audio-header">
+                <div class="audio-icon">🏛️</div>
+                <div class="audio-info">
+                    <div class="audio-title">Arven: Et splittet Spanien</div>
+                    <div class="audio-duration">14:30</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'arven')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>14:30</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="hemingway">
+            <div class="audio-header">
+                <div class="audio-icon">✍️</div>
+                <div class="audio-info">
+                    <div class="audio-title">Hemingway i Madrid</div>
+                    <div class="audio-duration">11:15</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'hemingway')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>11:15</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="audio-player" data-audio="eta">
+            <div class="audio-header">
+                <div class="audio-icon">💣</div>
+                <div class="audio-info">
+                    <div class="audio-title">ETA & Terrorismens Skygge</div>
+                    <div class="audio-duration">17:50</div>
+                </div>
+            </div>
+            <div class="audio-controls">
+                <button class="play-btn" onclick="toggleAudio(this, 'eta')">▶</button>
+                <div class="progress-container">
+                    <div class="progress-bar" onclick="seekAudio(event, this)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span>17:50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QUIZ SECTION -->
+    <div id="quiz" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">❓ Reflektions-Quiz</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Quiz før og efter hvert sted. Hvem fanger dybden? Vælg spiller først:</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="setPlayer('christian')" id="btn-christian" style="flex: 1; padding: 12px; background: var(--blood-red); color: white; border: none; border-radius: 8px; font-weight: 600;">Christian</button>
+            <button onclick="setPlayer('anders')" id="btn-anders" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-weight: 600;">Anders</button>
+            <button onclick="setPlayer('nico')" id="btn-nico" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-weight: 600;">Nico</button>
+        </div>
+        
+        <div id="quiz-container" class="quiz-container">
+            <div class="quiz-question" id="quiz-question">
+                Vælg en dag ovenfor eller tryk "Tilfældig Quiz" for at starte!
+            </div>
+            <div class="quiz-options" id="quiz-options">
+                <button class="quiz-option" onclick="selectDayQuiz('torsdag')">Torsdag: Vallecas</button>
+                <button class="quiz-option" onclick="selectDayQuiz('fredag')">Fredag: Franco & Kirken</button>
+                <button class="quiz-option" onclick="selectDayQuiz('lordag')">Lørdag: Vin</button>
+                <button class="quiz-option" onclick="selectDayQuiz('sondag')">Søndag: Las Ventas</button>
+            </div>
+            <div id="quiz-result"></div>
+        </div>
+        
+        <button onclick="randomQuiz()" style="width: 100%; padding: 15px; background: var(--gold); color: var(--dark); border: none; border-radius: 8px; font-weight: 700; margin-top: 20px; font-size: 1.1rem;">
+            🎲 Tilfældig Quiz Spørgsmål
+        </button>
+    </div>
+    
+    <!-- STATUS SECTION -->
+    <div id="status" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">✅ Samlet Booking Status</h2>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Torsdag 17/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedaje Puente de Vallecas</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ El Asturiano</h4>
+                    <p>Kl. 21:00 - Start i baren</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Fredag 18/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>☕ Tupay Bar</h4>
+                    <p>Morgenmad ved Peironcely 10</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ Walk-in</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>⛪ Hospedería Santa Cruz</h4>
+                    <p>3 værelser + middag</p>
+                </div>
+                <span class="status-badge status-pending">TIPS MARK</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Lørdag 19/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedería De La Tía María</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍇 Bodega Marañones</h4>
+                    <p>Rundvisning kl. 13:00</p>
+                </div>
+                <span class="status-badge status-action">📞 BOOKES NU</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ 7 Capillas</h4>
+                    <p>Kl. 21:00 - Bed Tía María hjælpe</p>
+                </div>
+                <span class="status-badge status-pending">Venter</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Søndag 20/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hostal Golden Alcala</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🐂 Las Ventas Tour</h4>
+                    <p>Kl. 14:00 - Los Chiqueros</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🎫 Korrida billetter</h4>
+                    <p>Kl. 18-19</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO (171€)</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ Puerta Grande</h4>
+                    <p>Kl. 21:30 - Rabo de Toro</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+        </div>
+        
+        <div class="warning-box" style="margin-top: 20px;">
+            <strong>📞 Husk at booke:</strong><br>
+            Bodega Marañones: +34 606 84 26 36<br>
+            Hospedería Santa Cruz: Se link på dagen
+        </div>
+    </div>
+    
+    <!-- AI CHAT SECTION -->
+    <div id="ai" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">🤖 Spørg rejseassistenten</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Jeg kan svare på spørgsmål om alle stederne på turen. Bemærk: Dette er en simuleret AI - i virkeligheden skal du integrere med en rigtig AI-tjeneste.</p>
+        
+        <div class="ai-chat-section" style="min-height: 60vh;">
+            <div class="ai-messages" id="ai-messages-main" style="max-height: 400px;">
+                <div class="ai-message bot">Hej! Jeg er jeres rejseassistent for Spanien-turen. Jeg kan fortælle om Vallecas, Franco, vinmarkerne i Gredos, Las Ventas og meget mere. Hvad vil I vide?</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-main" onkeypress="handleAIInput(event, 'main')">
+                <button onclick="sendAIMessage('main')">Send</button>
+            </div>
+        </div>
+        
+        <h3 style="margin: 30px 0 15px; color: var(--gold);">Populære spørgsmål</h3>
+ + middag</p>
+                </div>
+                <span class="status-badge status-pending">TIPS MARK</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Lørdag 19/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedería De La Tía María</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍇 Bodega Marañones</h4>
+                    <p>Rundvisning kl. 13:00</p>
+                </div>
+                <span class="status-badge status-action">📞 BOOKES NU</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ 7 Capillas</h4>
+                    <p>Kl. 21:00 - Bed Tía María hjælpe</p>
+                </div>
+                <span class="status-badge status-pending">Venter</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Søndag 20/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hostal Golden Alcala</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🐂 Las Ventas Tour</h4>
+                    <p>Kl. 14:00 - Los Chiqueros</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🎫 Korrida billetter</h4>
+                    <p>Kl. 18-19</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO (171€)</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ Puerta Grande</h4>
+                    <p>Kl. 21:30 - Rabo de Toro</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+        </div>
+        
+        <div class="warning-box" style="margin-top: 20px;">
+            <strong>📞 Husk at booke:</strong><br>
+            Bodega Marañones: +34 606 84 26 36<br>
+            Hospedería Santa Cruz: Se link på dagen
+        </div>
+    </div>
+    
+    <!-- AI CHAT SECTION -->
+    <div id="ai" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">🤖 Spørg rejseassistenten</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Jeg kan svare på spørgsmål om alle stederne på turen. Bemærk: Dette er en simuleret AI - i virkeligheden skal du integrere med en rigtig AI-tjeneste.</p>
+        
+        <div class="ai-chat-section" style="min-height: 60vh;">
+            <div class="ai-messages" id="ai-messages-main" style="max-height: 400px;">
+                <div class="ai-message bot">Hej! Jeg er jeres rejseassistent for Spanien-turen. Jeg kan fortælle om Vallecas, Franco, vinmarkerne i Gredos, Las Ventas og meget mere. Hvad vil I vide?</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-main" onkeypress="handleAIInput(event, 'main')">
+                <button onclick="sendAIMessage('main')">Send</button>
+            </div>
+        </div>
+        
+        <h3 style="margin: 30px 0 15px; color: var(--gold);">Populære spørgsmål</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button onclick="askQuick('Hvad betyder barrio obrero?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad betyder barrio obrero?</button>
+            <button onclick="askQuick('Hvornår døde Franco?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvornår døde Franco?</button>
+            <button onclick="askQuick('Hvad er Garnacha?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad er Garnacha?</button>
+            <button onclick="askQuick('Hvad er Los Chiqueros?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad er Los Chiqueros?</button>
+        </div>
+    </div>
+    
+    <!-- PRAKTISK SECTION -->
+    <div id="praktisk" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">📍 Praktisk Information</h2>
+        
+        <div class="quick-actions" style="margin-bottom: 25px;">
+            <a href="tel:+34606842636" class="quick-action">
+                <div class="quick-action-icon">📞</div>
+                <div class="quick-action-label">Marañones</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('status'); return false;">
+                <div class="quick-action-icon">✅</div>
+                <div class="quick-action-label">Se status</div>
+            </a>
+            <a href="https://maps.google.com" class="quick-action" target="_blank">
+                <div class="quick-action-icon">🗺️</div>
+                <div class="quick-action-label">Google Maps</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('ai'); return false;">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-label">Spørg AI</div>
+            </a>
+        </div>
+        
+        <h3 style="margin: 20px 0 10px 0; color: var(--blood-red);">🏨 Overnatning</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag – Puente de Vallecas</div>
+            <div class="info-value">Hospedaje Puente de Vallecas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle Sierra de Segura 2, 28038 Madrid</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag – Valle de Cuelgamuros</div>
+            <div class="info-value">Hospedería Santa Cruz</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Benediktinerklosteret</div>
+            <span class="status-badge status-pending" style="margin-top: 8px;">TIPS MARK</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag – San Martín de Valdeiglesias</div>
+            <div class="info-value">Hospedería De La Tía María</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+            <div style="font-size: 0.8rem; margin-top: 8px; color: #f39c12;">
+                ⚠️ Bed dem booke 7 Capillas kl. 21
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag – Madrid</div>
+            <div class="info-value">Hostal Golden Alcala</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🍽️ Restauranter</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag Aften</div>
+            <div class="info-value">El Asturiano</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Pablo Neruda 7, kl. 21:00</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Morgen</div>
+            <div class="info-value">Tupay Bar Restaurante</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle de Peironcely 12</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Aften</div>
+            <div class="info-value">Hospedería Santa Cruz</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Traditionel casera mad</div>
+            <span class="status-badge status-pending" style="margin-top: 8px;">TIPS MARK</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag Aften</div>
+            <div class="info-value">7 Capillas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:00 - Vin-nørderi</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag Aften</div>
+            <div class="info-value">Restaurante Puerta Grande</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:30 - Rabo de Toro</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+            <div style="font-size: 0.8rem; margin-top: 5px; color: #27ae60;">
+                Gem bekræftelse = adgangspas!
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🎯 Aktiviteter</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 14:00</div>
+            <div class="info-value">Las Ventas Tour</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Los Chiqueros, kapel, sygestue</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 18:00</div>
+            <div class="info-value">Korrida i Las Ventas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Sol-følgende tid</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO (171€)</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag 13:00</div>
+            <div class="info-value">Bodega Marañones</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Marcial Llorente 69</div>
+            <span class="status-badge status-action" style="margin-top: 8px;">📞 BOOKES</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                📞 +34 606 84 26 36<br>
+                ✉️ info@bodegamaranones.com
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">⛪ Fredag: Kloster</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Morgen – Laudes</div>
+            <div class="info-value">Kl. 08:15 – Kun ved invitation</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Spørg reception dagen før!</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Formiddag – Misa Conventual</div>
+            <div class="info-value">Kl. 11:00 – Basilikaen</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Gratis adgang | Mød op 10:30</div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="showSection('program')">
+            <span class="nav-icon">📅</span>
+            <span>Program</span>
+        </button>
+        <button class="nav-item" onclick="showSection('lyd')">
+            <span class="nav-icon">🎧</span>
+            <span>Podcast</span>
+        </button>
+        <button class="nav-item" onclick="showSection('quiz')">
+            <span class="nav-icon">❓</span>
+            <span>Quiz</span>
+        </button>
+        <button class="nav-item" onclick="showSection('praktisk')">
+            <span class="nav-icon">📍</span>
+            <span>Info</span>
+        </button>
+    </div>
+    
+    <script>
+        // State
+        let currentPlayer = 'christian';
+        let scores = { christian: 0, anders: 0, nico: 0 };
+        let currentQuiz = null;
+        let quizIndex = 0;
+        let audioIntervals = {};
+        let audioProgress = {};
+        
+        // Full articles content
+        const fullArticles = {
+            torsdag: `<h2>Arbejdernes Spanien: Puente de Vallecas</h2>
+            <p>Puente de Vallecas var et af de mest ikoniske og hårdt ramte arbejderkvarterer i Madrid under den spanske borgerkrig (1936-1939). Det lå strategisk sydøst for centrum, nær floden Manzanares og vejen mod Valencia, hvilket gjorde det til en vigtig gateway for republikken.</p>
+            <p><strong>Republikansk højborg:</strong> Kvarteret var stærkt venstreorienteret, med mange anarkister (CNT-FAI), socialister, kommunister og arbejdermilits. Det var et centrum for hurtig organisering af militsfolk (milicianos), der forsvarede Madrid mod Francos tropper.</p>
+            <p><strong>Frontlinje og bombardementer:</strong> Under belejringen af Madrid (især 1936-1937) blev området hårdt bombarderet af nationalistiske styrker og Nazi-Tysklands Legion Condor. Entrevías (en del af Puente de Vallecas) blev delvist evakueret, og mange huse blev ødelagt af artilleri og luftangreb.</p>
+            <p><strong>Ikonisk symbol:</strong> Det mest berømte sted er Peironcely 10 – et lille, skud- og splinterbeskadiget hus, fotograferet af Robert Capa i november 1936. Billedet viser en ødelagt facade med en kvinde og et barn foran – det blev et symbol på civilbefolkningens lidelser under belejringen.</p>
+            <p><strong>Puente de Vallecas i dag:</strong> I dag er Puente de Vallecas stadig et af Madrids mest autentiske arbejderkvarterer – et distrikt med over 230.000 indbyggere. Det er multikulturelt, med mange immigranter fra Latinamerika, Afrika og Østeuropa. Det er fortsat et barrio obrero med lavere indkomster, men også en stærk følelse af "vi mod eliten" – mange føler sig glemt af bystyret.</p>`,
+            
+            fredag: `<h2>Diktaturets Anatomi: Fra Grav til Monument</h2>
+            <p><strong>Exhumeringen af Franco:</strong> Francisco Franco døde den 20. november 1975 og blev begravet i Valle de los Caídos – et monument, han selv beordrede bygget fra 1940-1959 som "forsoning for borgerkrigens faldne", men reelt et triumf-symbol for nationalisterne.</p>
+            <p>I juni 2018 annoncerede Pedro Sánchez at han ville fjerne resterne. Efter 15 måneder med retssager og familiekonflikter blev Franco exhumeret den 24. oktober 2019 og flyttet til Cementerio Municipal de Mingorrubio.</p>
+            <p><strong>Valle de Cuelgamuros:</strong> Komplekset blev bygget primært med tvangsarbejde fra republikanske politiske fanger under "redención de penas por el trabajo" (straffereduktion gennem arbejde). Estimater tyder på 10.000-20.000 fanger over hele perioden, med hundredvis af dødsfald.</p>
+            <p><strong>Kirkens rolle:</strong> Den katolske kirke spillede en afgørende rolle under Franco-regimet. Via konkordatet med Vatikanet i 1953 fik kirken kontrol over uddannelse, ægteskab og censur, mens Franco fik titel som "Caudillo por la gracia de Dios" (lederen ved Guds nåde).</p>`,
+ + middag</p>
+                </div>
+                <span class="status-badge status-pending">TIPS MARK</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Lørdag 19/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hospedería De La Tía María</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍇 Bodega Marañones</h4>
+                    <p>Rundvisning kl. 13:00</p>
+                </div>
+                <span class="status-badge status-action">📞 BOOKES NU</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ 7 Capillas</h4>
+                    <p>Kl. 21:00 - Bed Tía María hjælpe</p>
+                </div>
+                <span class="status-badge status-pending">Venter</span>
+            </div>
+        </div>
+        
+        <div class="status-section">
+            <h3 style="color: var(--blood-red); margin-bottom: 15px;">Søndag 20/4</h3>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🏨 Hostal Golden Alcala</h4>
+                    <p>3 enkeltværelser</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🐂 Las Ventas Tour</h4>
+                    <p>Kl. 14:00 - Los Chiqueros</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ CHRISTIAN</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🎫 Korrida billetter</h4>
+                    <p>Kl. 18-19</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO (171€)</span>
+            </div>
+            <div class="status-item">
+                <div class="status-info">
+                    <h4>🍽️ Puerta Grande</h4>
+                    <p>Kl. 21:30 - Rabo de Toro</p>
+                </div>
+                <span class="status-badge status-confirmed">✓ NICO</span>
+            </div>
+        </div>
+        
+        <div class="warning-box" style="margin-top: 20px;">
+            <strong>📞 Husk at booke:</strong><br>
+            Bodega Marañones: +34 606 84 26 36<br>
+            Hospedería Santa Cruz: Se link på dagen
+        </div>
+    </div>
+    
+    <!-- AI CHAT SECTION -->
+    <div id="ai" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">🤖 Spørg rejseassistenten</h2>
+        <p style="margin-bottom: 20px; opacity: 0.8;">Jeg kan svare på spørgsmål om alle stederne på turen. Bemærk: Dette er en simuleret AI - i virkeligheden skal du integrere med en rigtig AI-tjeneste.</p>
+        
+        <div class="ai-chat-section" style="min-height: 60vh;">
+            <div class="ai-messages" id="ai-messages-main" style="max-height: 400px;">
+                <div class="ai-message bot">Hej! Jeg er jeres rejseassistent for Spanien-turen. Jeg kan fortælle om Vallecas, Franco, vinmarkerne i Gredos, Las Ventas og meget mere. Hvad vil I vide?</div>
+            </div>
+            <div class="ai-input">
+                <input type="text" placeholder="Skriv dit spørgsmål..." id="ai-input-main" onkeypress="handleAIInput(event, 'main')">
+                <button onclick="sendAIMessage('main')">Send</button>
+            </div>
+        </div>
+        
+        <h3 style="margin: 30px 0 15px; color: var(--gold);">Populære spørgsmål</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button onclick="askQuick('Hvad betyder barrio obrero?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad betyder barrio obrero?</button>
+            <button onclick="askQuick('Hvornår døde Franco?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvornår døde Franco?</button>
+            <button onclick="askQuick('Hvad er Garnacha?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad er Garnacha?</button>
+            <button onclick="askQuick('Hvad er Los Chiqueros?')" style="padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 20px; font-size: 0.85rem;">Hvad er Los Chiqueros?</button>
+        </div>
+    </div>
+    
+    <!-- PRAKTISK SECTION -->
+    <div id="praktisk" class="content-section">
+        <h2 style="margin-bottom: 20px; color: var(--gold);">📍 Praktisk Information</h2>
+        
+        <div class="quick-actions" style="margin-bottom: 25px;">
+            <a href="tel:+34606842636" class="quick-action">
+                <div class="quick-action-icon">📞</div>
+                <div class="quick-action-label">Marañones</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('status'); return false;">
+                <div class="quick-action-icon">✅</div>
+                <div class="quick-action-label">Se status</div>
+            </a>
+            <a href="https://maps.google.com" class="quick-action" target="_blank">
+                <div class="quick-action-icon">🗺️</div>
+                <div class="quick-action-label">Google Maps</div>
+            </a>
+            <a href="#" class="quick-action" onclick="showSection('ai'); return false;">
+                <div class="quick-action-icon">🤖</div>
+                <div class="quick-action-label">Spørg AI</div>
+            </a>
+        </div>
+        
+        <h3 style="margin: 20px 0 10px 0; color: var(--blood-red);">🏨 Overnatning</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag – Puente de Vallecas</div>
+            <div class="info-value">Hospedaje Puente de Vallecas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle Sierra de Segura 2, 28038 Madrid</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag – Valle de Cuelgamuros</div>
+            <div class="info-value">Hospedería Santa Cruz</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Benediktinerklosteret</div>
+            <span class="status-badge status-pending" style="margin-top: 8px;">TIPS MARK</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag – San Martín de Valdeiglesias</div>
+            <div class="info-value">Hospedería De La Tía María</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+            <div style="font-size: 0.8rem; margin-top: 8px; color: #f39c12;">
+                ⚠️ Bed dem booke 7 Capillas kl. 21
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag – Madrid</div>
+            <div class="info-value">Hostal Golden Alcala</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">3 enkeltværelser</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🍽️ Restauranter</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Torsdag Aften</div>
+            <div class="info-value">El Asturiano</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Pablo Neruda 7, kl. 21:00</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Morgen</div>
+            <div class="info-value">Tupay Bar Restaurante</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Calle de Peironcely 12</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Fredag Aften</div>
+            <div class="info-value">Hospedería Santa Cruz</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Traditionel casera mad</div>
+            <span class="status-badge status-pending" style="margin-top: 8px;">TIPS MARK</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag Aften</div>
+            <div class="info-value">7 Capillas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:00 - Vin-nørderi</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag Aften</div>
+            <div class="info-value">Restaurante Puerta Grande</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Kl. 21:30 - Rabo de Toro</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO</span>
+            <div style="font-size: 0.8rem; margin-top: 5px; color: #27ae60;">
+                Gem bekræftelse = adgangspas!
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">🎯 Aktiviteter</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 14:00</div>
+            <div class="info-value">Las Ventas Tour</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Los Chiqueros, kapel, sygestue</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ CHRISTIAN</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Søndag 18:00</div>
+            <div class="info-value">Korrida i Las Ventas</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Sol-følgende tid</div>
+            <span class="status-badge status-confirmed" style="margin-top: 8px;">✓ NICO (171€)</span>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Lørdag 13:00</div>
+            <div class="info-value">Bodega Marañones</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Avenida de Marcial Llorente 69</div>
+            <span class="status-badge status-action" style="margin-top: 8px;">📞 BOOKES</span>
+            <div style="font-size: 0.8rem; margin-top: 8px;">
+                📞 +34 606 84 26 36<br>
+                ✉️ info@bodegamaranones.com
+            </div>
+        </div>
+        
+        <h3 style="margin: 25px 0 10px 0; color: var(--blood-red);">⛪ Fredag: Kloster</h3>
+        
+        <div class="info-card">
+            <div class="info-label">Morgen – Laudes</div>
+            <div class="info-value">Kl. 08:15 – Kun ved invitation</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Spørg reception dagen før!</div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-label">Formiddag – Misa Conventual</div>
+            <div class="info-value">Kl. 11:00 – Basilikaen</div>
+            <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Gratis adgang | Mød op 10:30</div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="showSection('program')">
+            <span class="nav-icon">📅</span>
+            <span>Program</span>
+        </button>
+        <button class="nav-item" onclick="showSection('lyd')">
+            <span class="nav-icon">🎧</span>
+            <span>Podcast</span>
+        </button>
+        <button class="nav-item" onclick="showSection('quiz')">
+            <span class="nav-icon">❓</span>
+            <span>Quiz</span>
+        </button>
+        <button class="nav-item" onclick="showSection('praktisk')">
+            <span class="nav-icon">📍</span>
+            <span>Info</span>
+        </button>
+    </div>
+    
+    <script>
+        // State
+        let currentPlayer = 'christian';
+        let scores = { christian: 0, anders: 0, nico: 0 };
+        let currentQuiz = null;
+        let quizIndex = 0;
+        let audioIntervals = {};
+        let audioProgress = {};
+        
+        // Full articles content
+        const fullArticles = {
+            torsdag: `<h2>Arbejdernes Spanien: Puente de Vallecas</h2>
+            <p>Puente de Vallecas var et af de mest ikoniske og hårdt ramte arbejderkvarterer i Madrid under den spanske borgerkrig (1936-1939). Det lå strategisk sydøst for centrum, nær floden Manzanares og vejen mod Valencia, hvilket gjorde det til en vigtig gateway for republikken.</p>
+            <p><strong>Republikansk højborg:</strong> Kvarteret var stærkt venstreorienteret, med mange anarkister (CNT-FAI), socialister, kommunister og arbejdermilits. Det var et centrum for hurtig organisering af militsfolk (milicianos), der forsvarede Madrid mod Francos tropper.</p>
+            <p><strong>Frontlinje og bombardementer:</strong> Under belejringen af Madrid (især 1936-1937) blev området hårdt bombarderet af nationalistiske styrker og Nazi-Tysklands Legion Condor. Entrevías (en del af Puente de Vallecas) blev delvist evakueret, og mange huse blev ødelagt af artilleri og luftangreb.</p>
+            <p><strong>Ikonisk symbol:</strong> Det mest berømte sted er Peironcely 10 – et lille, skud- og splinterbeskadiget hus, fotograferet af Robert Capa i november 1936. Billedet viser en ødelagt facade med en kvinde og et barn foran – det blev et symbol på civilbefolkningens lidelser under belejringen.</p>
+            <p><strong>Puente de Vallecas i dag:</strong> I dag er Puente de Vallecas stadig et af Madrids mest autentiske arbejderkvarterer – et distrikt med over 230.000 indbyggere. Det er multikulturelt, med mange immigranter fra Latinamerika, Afrika og Østeuropa. Det er fortsat et barrio obrero med lavere indkomster, men også en stærk følelse af "vi mod eliten" – mange føler sig glemt af bystyret.</p>`,
+            
+            fredag: `<h2>Diktaturets Anatomi: Fra Grav til Monument</h2>
+            <p><strong>Exhumeringen af Franco:</strong> Francisco Franco døde den 20. november 1975 og blev begravet i Valle de los Caídos – et monument, han selv beordrede bygget fra 1940-1959 som "forsoning for borgerkrigens faldne", men reelt et triumf-symbol for nationalisterne.</p>
+            <p>I juni 2018 annoncerede Pedro Sánchez at han ville fjerne resterne. Efter 15 måneder med retssager og familiekonflikter blev Franco exhumeret den 24. oktober 2019 og flyttet til Cementerio Municipal de Mingorrubio.</p>
+            <p><strong>Valle de Cuelgamuros:</strong> Komplekset blev bygget primært med tvangsarbejde fra republikanske politiske fanger under "redención de penas por el trabajo" (straffereduktion gennem arbejde). Estimater tyder på 10.000-20.000 fanger over hele perioden, med hundredvis af dødsfald.</p>
+            <p><strong>Kirkens rolle:</strong> Den katolske kirke spillede en afgørende rolle under Franco-regimet. Via konkordatet med Vatikanet i 1953 fik kirken kontrol over uddannelse, ægteskab og censur, mens Franco fik titel som "Caudillo por la gracia de Dios" (lederen ved Guds nåde).</p>`,
+            
+            lordag: `<h2>Granit og Genfødsel: Madrids Vinrevolution</h2>
+            <p><strong>San Martín de Valdeiglesias:</strong> Byen ligger cirka 70 kilometer vest for Madrid og markerer overgangen mellem det flade castilianske plateau og de dramatiske bjerge i Sierra de Gredos. Byen er det vigtigste knudepunkt i Madrids vestligste vinzone.</p>
+            <p><strong>Terroir:</strong> Området er domineret af nedbrudt granit. Denne sandede, mineralske jordbund er nøglen til byens vinkvalitet, da den tvinger vinstokkene til at søge dybt og giver vinene karakteristisk friskhed.</p>
+            <p><strong>Bodega Marañones:</strong> De er en del af den eksklusive gruppe Grandes Pagos de España. De ejer 20 hektar fordelt på små øer af vinmarker midt i vild natur. Deres signaturvin kommer fra 50-70 år gamle Garnacha-stokke.</p>
+            <p><strong>Garnacha-revival:</strong> Marañones har specialiseret sig i at genopdage gamle kloner af Garnacha med tyndere skal og mindre sukkerindhold end i Sydspanien. De fokuserer på de "røde frugter" (hindbær, jordbær) frem for de mørke, syltede noter.</p>`,
+            
+            sondag: `<h2>Arenaens Ritualer: Las Ventas' Dobbelte Historie</h2>
+            <p><strong>Koncentrationslejr:</strong> I 1939 blev Las Ventas transformeret til et "center for genopdragelse og straf" for republikanske fanger. Arenaens arkitektur blev udnyttet til psykologisk krigsførelse – vagter kunne sidde på de øverste rækker med maskingeværer og have totalt overblik.</p>
+            <p><strong>Los Chiqueros:</strong> De små, mørke rum hvor tyrene normalt venter, blev brugt som midlertidige isolationsceller for de mest "genstridige" fanger.</p>
+            <p><strong>La Corrida de la Victoria:</strong> Den 24. maj 1939 afholdt Franco "Sejrs-korridaen". Det var en politisk eksorcisme hvor 23.000 mennesker råbte "Franco, Franco, Franco!" mens den fascistiske elite fejrede på tribunerne – renset for blod fra de fanger der stadig sad i kældrene.</p>
+            <p><strong>Den moderne debat:</strong> I dag er tyrefægtning et af de mest polariserende emner i Spanien. For højrefløjen (PP og VOX) er det en urørlig søjle i spanskheden. For venstrefløjen er det barbari og en rest af "det mørke Spanien".</p>`
+        };
+        
+        // AI Responses database
+        const aiResponses = {
+            'barrio obrero': 'Barrio obrero betyder "arbejderkvarter" på spansk. Det er et boligområde traditionelt beboet af arbejderklassen, ofte med stærk fagforeningsaktivitet og venstreorienteret politik. Puente de Vallecas er et klassisk eksempel – stadig "rødt" den dag i dag.',
+            'franco': 'Francisco Franco Bahamonde (1892-1975) var Spaniens diktator fra 1939 til sin død. Han kom til magten gennem en blodig borgerkrig støttet af Nazi-Tyskland og fascistiske Italien. Hans regime var præget af undertrykkelse, censur og politisk fængsling. Han døde den 20. november 1975.',
+            'døde franco': 'Franco døde den 20. november 1975 på hospitalet i Madrid. Han blev holdt kunstigt i live i ugevis, mens hans nærmeste kæmpede om magten. Hans død markerede slutningen på 36 års diktatur og begyndelsen på Spaniens overgang til demokrati.',
+            'garnacha': 'Garnacha (eller Grenache på fransk) er en rød druesort der stammer fra Spanien. Den trives særligt godt i varme, tørre områder og giver vine med høj alkohol og smag af røde bær. I Gredos-regionen findes unikke gamle kloner på granitjord.',
+            'los chiqueros': 'Los Chiqueros er de små stalde/venterum hvor tyrene opholder sig før de går ind i arenaen. Under Franco-regimet i 1939 blev de brugt som isolationsceller for republikanske fanger i Las Ventas – mørke, trange rum uden ventilation.',
+            'peironcely': 'Peironcely 10 er et lille arbejderhus i Puente de Vallecas der blev bombarderet i november 1936. Robert Capas berømte foto af tre børn i ruinerne blev et globalt symbol på borgerkrigens grusomheder. Huset står stadig i dag som mindested.',
+            'vallecas': 'Puente de Vallecas er et arbejderkvarter i Madrid med 240.000 indbyggere. Det var republikansk højborg under borgerkrigen og er stadig et af Madrids mest venstreorienterede områder – kendt for antifascistisk aktivisme og solidaritet.',
+            'exhumering': 'Franco blev exhumeret (flyttet fra graven) den 24. oktober 2019. Operationen foregik i hemmelighed kun 22 familiemedlemmer var til stede. Han blev flyttet fra Valle de los Caídos til Mingorrubio-kirkegården – fra triumfmonument til anonym grav.',
+            'valle de cuelgamuros': 'Valle de Cuelgamuros (tidligere Valle de los Caídos) er et monumentalt kompleks bygget af tvangsarbejdende republikanske fanger 1940-1959. Det er 150 meter højt kors og basilika hugget ind i bjerget. I dag omfortolkes det som mindested for alle ofre.',
+            'kirkens rolle': 'Den katolske kirke var Francos vigtigste ideologiske partner. Via konkordatet 1953 fik kirken kontrol over uddannelse og censur, mens Franco fik titel "ved Guds nåde". Kirken velsignede tropper og legitimerede undertrykkelsen som "korstog mod kommunisme".',
+            'las ventas': 'Las Ventas er Spaniens største tyrefægterarena, bygget 1929. Under borgerkrigen blev den brugt som koncentrationslejr for republikanske fanger. I dag er den et symbol på både spansk tradition og politisk kontrovers.',
+            'tyrefægtning': 'Tyrefægtning (corrida) er et ritual med rødder tilbage til romertiden. Det er ikke en sport men en kunstform hvor matadoren gennem præcise bevægelser (temple) dominerer tyren. For Franco var det symbol på orden over kaos – fascistisk ideologi i praksis.',
+            'marañones': 'Bodega Marañones er et Grandes Pagos de España medlemskab beliggende i San Martín de Valdeiglesias. De specialiserer sig i gamle Garnacha-vinstokke på granitjord. Deres vine er kendt for mineralsk præcision og elegante røde frugter.',
+            'sierra de gredos': 'Sierra de Gredos er en bjergkæde vest for Madrid der danner grænsen mellem Castilla y León og Castilla-La Mancha. Bjergene skaber et unikt mikroklima med kølige nætter perfekt til Garnacha-dyrkning.',
+            'robert capa': 'Robert Capa (1913-1954) var en ungarsk-amerikansk krigsfotograf. Hans foto fra Peironcely 10 den 20. november 1936 blev et af borgerkrigens mest ikoniske billeder – tre børn i ruinerne symboliserede uskyld midt i ødelæggelsen.',
+            'borgerkrig': 'Den spanske borgerkrig (1936-1939) var en væbnet konflikt mellem republikanerne (demokratisk valgt regering) og nationalisterne (militærkup anført af Franco). Den kostede 500.000 liv og efterlod dybe ar i spansk samfund.',
+            'republikanere': 'Republikanerne var den lovligt valgte demokratiske regering under borgerkrigen. De omfattede socialister, kommunister, anarkister og liberale. De blev støttet af Sovjetunionen og Internationale Brigader men tabte krigen i 1939.',
+            'nationalister': 'Nationalisterne var oprørsstyrkerne under Franco der kæmpede mod republikken. De omfattede falangister (fascister), monarkister, carlister og hæren. De fik massiv militær støtte fra Nazi-Tyskland og Italien og vandt krigen i 1939.',
+            'eta': 'ETA (Euskadi Ta Askatasuna) var en baskisk separatistisk terrororganisation aktiv 1959-2018. De myrdede over 800 mennesker i kampen for baskisk uafhængighed. Deres mest spektakulære aktion var attentatet mod Carrero Blanco i 1973.',
+            'carrero blanco': 'Luis Carrero Blanco var Francos udpegede efterfølger. Den 20. december 1973 blev han myrdet af ETA i Madrid. Attentatet efterlod et magtvakuum og fremskyndede Spaniens overgang til demokrati efter Francos død.',
+            'overgang': 'La Transición (1975-1982) var Spaniens fredelige overgang fra diktatur til demokrati. Under ledelse af kong Juan Carlos og Adolfo Suárez blev der indgået "Glemselens Pagt" for at undgå ny borgerkrig – men det efterlod uafklarede spørgsmål om fortidens forbrydelser.'
+        };
+        
+        // Countdown
+        function updateCountdown() {
+            const tripDate = new Date('2025-04-17T00:00:00');
+            const now = new Date();
+            const diff = tripDate - now;
+            
+            if (diff <= 0) {
+                document.getElementById('countdown').textContent = 'VI ER AFSTED! 🎉';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            document.getElementById('countdown').textContent = `${days} dage, ${hours} timer`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+        
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            event.target.closest('.nav-item')?.classList.add('active');
+        }
+        
+        function showDayDetail(day) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.day-detail').forEach(d => d.classList.remove('active'));
+            document.getElementById('day-' + day).classList.add('active');
+        }
+        
+        function hideDayDetail() {
+            document.querySelectorAll('.day-detail').forEach(d => d.classList.remove('active'));
+            document.getElementById('program').classList.add('active');
+        }
+        
+        // Car Mode
+        function toggleCarMode() {
+            document.body.classList.toggle('car-mode-active');
+            const btn = document.querySelector('.car-mode');
+            btn.textContent = document.body.classList.contains('car-mode-active') ? '🚗 BIL MODE: ON' : '🚗 BIL';
+        }
+        
+        // Audio Player - FIXED VERSION
+        function toggleAudio(btn, trackId) {
+            const player = btn.closest('.audio-player');
+            const isPlaying = btn.classList.contains('playing');
+            
+            // Stop all other audio
+            document.querySelectorAll('.play-btn').forEach(b => {
+                b.classList.remove('playing');
+                b.textContent = '▶';
+            });
+            Object.keys(audioIntervals).forEach(key => {
+                clearInterval(audioIntervals[key]);
+                delete audioIntervals[key];
+            });
+            
+            if (!isPlaying) {
+                btn.classList.add('playing');
+                btn.textContent = '⏸';
+                
+                // Simulate progress
+                if (!audioProgress[trackId]) audioProgress[trackId] = 0;
+                
+                audioIntervals[trackId] = setInterval(() => {
+                    audioProgress[trackId] += 0.5;
+                    const fill = player.querySelector('.progress-fill');
+                    const timeDisplay = player.querySelector('.current-time');
+                    
+                    if (fill) fill.style.width = audioProgress[trackId] + '%';
+                    if (timeDisplay) {
+                        const totalSeconds = Math.floor((audioProgress[trackId] / 100) * 600); // 10 min max
+                        const mins = Math.floor(totalSeconds / 60);
+                        const secs = totalSeconds % 60;
+                        timeDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    }
+                    
+                    if (audioProgress[trackId] >= 100) {
+                        btn.classList.remove('playing');
+                        btn.textContent = '▶';
+                        clearInterval(audioIntervals[trackId]);
+                        delete audioIntervals[trackId];
+                        audioProgress[trackId] = 0;
+                    }
+                }, 100);
+            }
+        }
+        
+        function seekAudio(event, progressBar) {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = ((event.clientX - rect.left) / rect.width) * 100;
+            const fill = progressBar.querySelector('.progress-fill
